@@ -1,0 +1,12 @@
+primitive: "ForceComp"
+reference_frame: "RELATIVE"
+target: [0.0, 0.0, +0.10, 0.0, 0.0, 0.0]
+
+motion_params:
+  vel: 0.15
+  acc: 0.50
+  hold: true # if true, the robot will hold the target pose after reaching it; if false, the robot shall stop at the target pose and release the control of the robot
+
+comp_axis: [1, 1, 1, 1, 1, 1]
+enable_max_wrench: [1, 1, 1, 1, 1, 1]
+max_contact_wrench: [25.0, 25.0, 25.0, 25.0, 25.0, 25.0]

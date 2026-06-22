@@ -1,0 +1,15 @@
+primitive: "AlignContact"
+reference_frame: "RELATIVE" # Search relative to initial position
+
+# Move down along tool-Z at 10 cm/s until flush contact is achieved
+search_vel: [0.0, 0.0, -0.1, 0.0, 0.0, 0.0]
+
+# Threshold conditions
+contact_force: [8.0, 8.0, 8.0]       # Stop linear search if 8 Newtons resistance occurs
+contact_torque: [1.5, 1.5, 1.5]     # Actively orient wrist if 1.5 Nm pivot occurs
+align_stiffness: [80.0, 80.0, 80.0]  # Compliance stiffness parameters during match
+
+motion_params:
+  vel: 0.10
+  acc: 0.40
+  hold: false  # if true, maintains the flush parallel surface lock state until Ctrl+C is pressed

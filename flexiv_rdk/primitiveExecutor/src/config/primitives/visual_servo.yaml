@@ -1,0 +1,29 @@
+primitive: "HPImageBasedVS"
+objName: "aruco_marker"      # Must match the Python script payload
+objIndex: 0
+
+# The target pixel coordinates for the 4 ArUco corners. 
+# These specific values form a perfect square in the exact center of a 640x480 camera feed.
+targetFeaturePts:
+  - [270.0, 190.0]  # Top-Left corner
+  - [370.0, 190.0]  # Top-Right corner
+  - [370.0, 290.0]  # Bottom-Right corner
+  - [270.0, 290.0]  # Bottom-Left corner
+
+# Target physical standoff distance: 30 centimeters
+targetDepth: [0.30] 
+
+# Allowed adjustment axes in the camera frame: [X, Y, Z, Rx, Ry, Rz]
+# 1 = Allow movement, 0 = Lock axis. 
+# Here we allow X, Y, Z translation and Rz (yaw) rotation to align the square.
+vsAxis: [1, 1, 1, 0, 0, 1]
+
+# Tuning parameters
+velScale: 10.0          # Speed multiplier (lower this if the robot overshoots/vibrates)
+maxVel: 0.05            # Hard limit linear speed to 5 cm/s for safety
+maxAngVel: 20.0         # Hard limit angular speed to 20 deg/s
+imageConvToler: 4.0     # Alignment is considered "perfect" when corners are within 4 pixels of target
+targetConvTimes: 5      # Must hold the perfect alignment for 5 consecutive frames to finish
+
+motion_params:
+  hold: true           # Set to true if you want it to track the marker continuously forever

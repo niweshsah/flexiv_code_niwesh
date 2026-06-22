@@ -1,0 +1,13 @@
+primitive: "ForceTraj"
+reference_frame: "RELATIVE"
+
+waypoints:
+  - [0.20, 0.00, 0.00, 0.00, 0.00, 0.00]
+
+# Compliance scaling matrix: Soften linear axes to 40% stiffness 
+stiff_scale: [0.40, 0.40, 0.40, 1.0, 1.0, 1.0]
+
+motion_params:
+  vel: 0.08
+  acc: 0.30
+  hold: false

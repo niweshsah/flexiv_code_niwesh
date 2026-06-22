@@ -1,0 +1,17 @@
+primitive: "ForceHybrid"
+reference_frame: "RELATIVE"
+
+# Triangle wiping trajectory path sequence
+waypoints:
+  - [0.10, 0.00, 0.00, 0.00, 0.00, 0.00]
+  - [0.05, 0.10, 0.00, 0.00, 0.00, 0.00]
+  - [0.00, 0.00, 0.00, 0.00, 0.00, 0.00]
+
+# Active closed-loop force tracking options
+contact_axis: [0.0, 0.0, 1.0] # Track force natively along tool Z direction
+contact_force: 12.0          # Constant active force output in Newtons
+
+motion_params:
+  vel: 0.05
+  acc: 0.20
+  hold: false
