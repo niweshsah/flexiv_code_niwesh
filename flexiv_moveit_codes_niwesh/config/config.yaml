@@ -9,12 +9,11 @@ pbvs_controller:
     continue_to_last_known_target: true     # Safely tracks the last resolved pose if occluded
     
     # --- Tuning Gains & Speed Safety Caps ---
-    gain_translation: 1.5                   # Slightly lowered from 2.5 for initial safety testing
-    gain_rotation: 1.0                      # Slightly lowered from 1.5 for initial safety testing
-    max_translation_vel: 0.15               # Capped at 15 cm/s for safety during initial trials
-    max_rotation_vel: 0.4                   # Capped at 0.4 rad/s 
+    gain_translation: 2.5                   # Increased from 1.5. Makes the arm accelerate faster when far away.
+    gain_rotation: 1.5                      # Increased from 1.0. Snaps the rotation into place faster.
+    max_translation_vel: 0.35               # Increased to 35 cm/s. The physical speed limit.
+    max_rotation_vel: 0.8                   # Increased to 0.8 rad/s.
     
-    # --- Noise Mitigation & Stability ---
-    deadband_translation: 0.003             # 3mm deadband to suppress vision jitter
-    deadband_rotation: 0.008                # ~0.5 degree orientation deadband
-    smoothing_alpha: 0.15                   # Exponential moving average filter weight
+    deadband_translation: 0.003             
+    deadband_rotation: 0.008                
+    smoothing_alpha: 0.20                   # Slightly increased from 0.15 to allow faster response to sudden movements

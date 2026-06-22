@@ -1,10 +1,12 @@
 import os
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument,SetEnvironmentVariable
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command, FindExecutable, PathJoinSubstitution, LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
+from launch.actions import ExecuteProcess, RegisterEventHandler
+from launch.event_handlers import OnProcessStart
 
 def generate_launch_description():
     # Declare configurable parameters
@@ -14,6 +16,12 @@ def generate_launch_description():
     # Paths to configuration parameters
     pkg_share = FindPackageShare('flexiv_moveit_codes_niwesh')
     pbvs_config = PathJoinSubstitution([pkg_share, 'config', 'config.yaml'])
+
+
+#     set_debug_logging = SetEnvironmentVariable(
+#     name='RCUTILS_LOGGING_SEVERITY_THRESHOLD', 
+#     value='DEBUG'
+# )
 
     # ==========================================
     # 1. INTEL REALSENSE CAMERA LAUNCH
@@ -81,6 +89,25 @@ def generate_launch_description():
     #     output='screen'
     # )
 
+
+    trigger_servo_service = ExecuteProcess(
+    cmd=[[
+        'ros2 service call ',
+        '/servo_node/start_servo ',
+        'std_srvs/srv/Trigger ',
+        '{}'
+    ]],
+    shell=True
+)
+
+    # 2. Wait until the bringup launch/servo node starts before executing the service call
+    automate_servo_start = RegisterEventHandler(
+        OnProcessStart(
+            target_action=robot_bringup_launch, # Triggers when your bringup launch begins
+            on_start=[trigger_servo_service]
+        )
+    )
+
     return LaunchDescription([
         robot_sn_arg,
         marker_size_arg,
@@ -88,5 +115,7 @@ def generate_launch_description():
         robot_bringup_launch,
         static_tf_node,
         aruco_node,
+        # set_debug_logging,
         # pbvs_node
+        automate_servo_start
     ])
