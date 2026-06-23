@@ -1,0 +1,33 @@
+pbvs_controller:
+  ros__parameters:
+    move_group_name: "Rizon4s-063387_arm"
+    base_frame: "Rizon4s-063387_base_link"  # Matches your live /tf topic
+    ee_frame: "Rizon4s-063387_flange"        # Your physical flange link
+    
+    # --- State Machine Configuration ---
+    target_timeout_sec: 0.5
+    continue_to_last_known_target: false     # Safely tracks the last resolved pose if occluded
+    
+    # --- Tuning Gains & Speed Safety Caps ---
+    gain_translation: 3.5                   # Increased from 1.5. Makes the arm accelerate faster when far away.
+    gain_rotation: 2.5                      # Increased from 1.0. Snaps the rotation into place faster.
+    max_translation_vel: 1.25               # Increased to 65 cm/s. The physical speed limit.
+    max_rotation_vel: 0.8                   # Increased to 0.8 rad/s.
+    desired_standoff: 0.4                  # The distance to maintain from the target (in meters)
+    
+    deadband_translation: 0.003             # not used right now
+    deadband_rotation: 0.008                # not used right now
+    smoothing_alpha: 0.20                   # not used in the current implementation, but can be used for smoothing the twist commands if needed
+
+
+    # Debugging purpose(dont)
+    sign_x: 1
+    sign_y: 1
+    sign_z: 1
+
+    sign_rx: -1
+    sign_ry: -1
+    sign_rz: 1
+
+    offset_x: -0.1
+    offset_y: -0.1

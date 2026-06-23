@@ -59,6 +59,14 @@ private:
     double max_v_, max_w_;
     double deadband_v_, deadband_w_;
     double alpha_;
+    double desired_standoff_; // Added to store the desired standoff distance
+
+    // debugging coordinate
+    int sign_x_, sign_y_, sign_z_; // Added to store the signs for axis inversion
+
+    int sign_rx_, sign_ry_, sign_rz_; // Added to store the signs for rotation axis inversion
+
+    double offset_x_, offset_y_; // Added to store the offsets for x and y axes
     
     Eigen::VectorXd smoothed_twist_;
 };

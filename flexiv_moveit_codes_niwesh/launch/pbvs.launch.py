@@ -1,12 +1,11 @@
 import os
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument,SetEnvironmentVariable
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, TimerAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import Command, FindExecutable, PathJoinSubstitution, LaunchConfiguration
+from launch.substitutions import  PathJoinSubstitution, LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
-from launch.actions import ExecuteProcess, RegisterEventHandler
-from launch.event_handlers import OnProcessStart
+from launch.actions import ExecuteProcess
 
 def generate_launch_description():
     # Declare configurable parameters
@@ -15,13 +14,10 @@ def generate_launch_description():
 
     # Paths to configuration parameters
     pkg_share = FindPackageShare('flexiv_moveit_codes_niwesh')
-    pbvs_config = PathJoinSubstitution([pkg_share, 'config', 'config.yaml'])
+    pbvs_config = PathJoinSubstitution([pkg_share, 'config', 'pbvs_controller_config.yaml'])
+    aruco_config = PathJoinSubstitution([pkg_share, 'config', 'aruco_pose_config.yaml'])
 
 
-#     set_debug_logging = SetEnvironmentVariable(
-#     name='RCUTILS_LOGGING_SEVERITY_THRESHOLD', 
-#     value='DEBUG'
-# )
 
     # ==========================================
     # 1. INTEL REALSENSE CAMERA LAUNCH
@@ -74,7 +70,7 @@ def generate_launch_description():
         package='flexiv_moveit_codes_niwesh',
         executable='aruco_pose_estimator',
         name='aruco_pose_estimator',
-        parameters=[{'marker_size': LaunchConfiguration('marker_size')}],
+        parameters=[aruco_config],
         output='screen'
     )
 
@@ -90,22 +86,20 @@ def generate_launch_description():
     # )
 
 
+    # ==========================================
+    # 7. SERVICE AUTOMATION LOGIC
+    # ==========================================
+    # Execute the service call command directly via shell string syntax
     trigger_servo_service = ExecuteProcess(
-    cmd=[[
-        'ros2 service call ',
-        '/servo_node/start_servo ',
-        'std_srvs/srv/Trigger ',
-        '{}'
-    ]],
-    shell=True
-)
+        cmd=['ros2 service call /servo_node/start_servo std_srvs/srv/Trigger "{}"'],
+        shell=True,
+        output='screen'
+    )
 
-    # 2. Wait until the bringup launch/servo node starts before executing the service call
-    automate_servo_start = RegisterEventHandler(
-        OnProcessStart(
-            target_action=robot_bringup_launch, # Triggers when your bringup launch begins
-            on_start=[trigger_servo_service]
-        )
+    # Wrap the service call with a 5-second timer delay to allow MoveIt core components to load
+    automate_servo_start = TimerAction(
+        period=5.0,
+        actions=[trigger_servo_service]
     )
 
     return LaunchDescription([

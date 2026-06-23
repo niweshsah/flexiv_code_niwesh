@@ -1,0 +1,13 @@
+aruco_pose_estimator:
+  ros__parameters:
+    # Vision & Frame Settings
+    marker_size: 0.0775              # Size of the ArUco marker in meters
+    camera_frame: "camera_color_optical_frame"
+    target_marker_id: -1             # Use -1 to track any marker, or specify an ID
+
+    # Filter Settings
+    filter_alpha: 0.25               # 1.0 = raw data, 0.1 = heavy smoothing
+    
+    # Deadband Thresholds
+    position_deadband: 0.003         # Minimum movement required to update (in meters, 0.003 = 3mm)
+    rotation_deadband: 0.035         # Minimum rotation required to update (in radians, 0.035 ≈ 2 degrees)
