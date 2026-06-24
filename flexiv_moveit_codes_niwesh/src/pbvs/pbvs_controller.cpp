@@ -13,7 +13,7 @@ ros2 service call /servo_node/start_servo std_srvs/srv/Trigger {}
 */
 
 /*
- Run as ros2 run flexiv_moveit_codes_niwesh pbvs_controller_node --ros-args --params-file /home/tcs/flexiv_ros2_ws/src/flexiv_moveit_codes_niwesh/config/config.yaml
+ Run as ros2 run flexiv_moveit_codes_niwesh pbvs_controller_node --ros-args --params-file /home/tcs/flexiv_ros2_ws/src/flexiv_moveit_codes_niwesh/config/pbvs_controller_config.yaml 
 
 */
 
@@ -39,6 +39,7 @@ namespace pbvs_servo
 
         deadband_v_ = this->declare_parameter<double>("deadband_translation", 0.003);
         deadband_w_ = this->declare_parameter<double>("deadband_rotation", 0.008);
+        pub_freq_ = this->declare_parameter<double>("publish_frequency", 100.0);
 
         sign_x_ = this->declare_parameter<int>("sign_x", 1);
         sign_y_ = this->declare_parameter<int>("sign_y", 1);
@@ -51,7 +52,7 @@ namespace pbvs_servo
         offset_x_ = this->declare_parameter<double>("offset_x", 0.0);
         offset_y_ = this->declare_parameter<double>("offset_y", 0.0);
 
-        alpha_ = this->declare_parameter<double>("smoothing_alpha", 0.15);
+        alpha_ = this->declare_parameter<double>("smoothing_alpha", 0.3);
 
         smoothed_twist_.setZero();
 
@@ -74,6 +75,8 @@ namespace pbvs_servo
         RCLCPP_INFO(this->get_logger(), "Smoothing Alpha:     %.3f", alpha_);
         RCLCPP_INFO(this->get_logger(), "Desired Standoff:    %.3f m", desired_standoff_);
 
+        RCLCPP_INFO(this->get_logger(), "Publish Frequency:   %.1f Hz", pub_freq_);
+
         RCLCPP_INFO(this->get_logger(), "Axis Signs:          [X: %d, Y: %d, Z: %d]", sign_x_, sign_y_, sign_z_);
 
         RCLCPP_INFO(this->get_logger(), "Rot Axis Signs:      [RX: %d, RY: %d, RZ: %d]", sign_rx_, sign_ry_, sign_rz_);
@@ -95,9 +98,10 @@ namespace pbvs_servo
         // 100Hz Control Loop
         // This timer calls the controlLoop function at a fixed rate of 100Hz
         // We could have use a while loop with rclcpp::Rate, but using a timer is more in line with ROS2's design and allows for better integration with the executor.
-
+        
+        int period = static_cast<int>(1000.0 / pub_freq_); // Calculate the period in milliseconds based on the publish frequency
         control_timer_ = this->create_wall_timer(
-            std::chrono::milliseconds(10), std::bind(&PbvsController::controlLoop, this));
+            std::chrono::milliseconds(period), std::bind(&PbvsController::controlLoop, this));
 
         RCLCPP_INFO(this->get_logger(), "PBVS Controller Node Started.");
         RCLCPP_INFO(this->get_logger(), "Tracking Target in Tool Frame: [%s]", ee_frame_.c_str());
@@ -239,16 +243,16 @@ namespace pbvs_servo
         Eigen::VectorXd raw_twist(6);
         for (int i = 0; i < 3; ++i)
         {
-            // raw_twist(i) = clampVelocity(k_v_ * applyDeadband(e_v(i), deadband_v_), max_v_);
-            // raw_twist(i + 3) = clampVelocity(k_w_ * applyDeadband(e_w(i), deadband_w_), max_w_);
+            raw_twist(i) = clampVelocity(k_v_ * applyDeadband(e_v(i), deadband_v_), max_v_);
+            raw_twist(i + 3) = clampVelocity(k_w_ * applyDeadband(e_w(i), deadband_w_), max_w_);
 
-            // Not using deadband for now, as it is being used in ArUco Pose Estimator
-            raw_twist(i) = clampVelocity(k_v_ * e_v(i), max_v_);
-            raw_twist(i + 3) = clampVelocity(k_w_ * e_w(i), max_w_);
+            // // Not using deadband for now, as it is being used in ArUco Pose Estimator
+            // raw_twist(i) = clampVelocity(k_v_ * e_v(i), max_v_);
+            // raw_twist(i + 3) = clampVelocity(k_w_ * e_w(i), max_w_);
         }
 
         // Smooth output via Exponential Moving Average (EMA) Filter
-        alpha_ = 1.0; // we are not using EMA filter now, as it is being used in MoveIt Servo, 
+        // alpha_ = 1.0; // we are not using EMA filter now, as it is being used in MoveIt Servo, 
         smoothed_twist_ = alpha_ * raw_twist + (1.0 - alpha_) * smoothed_twist_;
 
         // Populate Twist Message

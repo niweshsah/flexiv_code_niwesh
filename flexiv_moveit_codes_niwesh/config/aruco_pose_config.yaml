@@ -6,7 +6,7 @@ aruco_pose_estimator:
     target_marker_id: -1             # Use -1 to track any marker, or specify an ID
 
     # Filter Settings
-    filter_alpha: 0.25               # 1.0 = raw data, 0.1 = heavy smoothing
+    filter_alpha: 0.1               # 1.0 = raw data, 0.1 = heavy smoothing
     
     # Deadband Thresholds
     position_deadband: 0.003         # Minimum movement required to update (in meters, 0.003 = 3mm)

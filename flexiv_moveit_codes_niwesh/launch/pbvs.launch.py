@@ -38,12 +38,14 @@ def generate_launch_description():
     # ==========================================
     robot_bringup_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
+
             PathJoinSubstitution([FindPackageShare('flexiv_bringup'), 'launch', 'rizon_moveit.launch.py'])
         ]),
         launch_arguments={
             'robot_sn': LaunchConfiguration('robot_sn'),
             'use_fake_hardware': 'false',
-            'start_servo': 'true'  # Start the MoveIt servo node
+            'start_servo': 'true' , # Start the MoveIt servo node
+            'use_joint_group_position_controller': 'true'  # Use the ultra-low latency joint_group_position_controller for visual servoing
         }.items()
     )
 

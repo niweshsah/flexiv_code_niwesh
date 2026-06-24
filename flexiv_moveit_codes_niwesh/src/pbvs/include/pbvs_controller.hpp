@@ -60,6 +60,7 @@ private:
     double deadband_v_, deadband_w_;
     double alpha_;
     double desired_standoff_; // Added to store the desired standoff distance
+    double pub_freq_; // Added to store the publish frequency for the control loop
 
     // debugging coordinate
     int sign_x_, sign_y_, sign_z_; // Added to store the signs for axis inversion

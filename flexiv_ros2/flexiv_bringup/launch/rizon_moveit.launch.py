@@ -59,6 +59,7 @@ def launch_setup(context):
     fake_sensor_commands = LaunchConfiguration("fake_sensor_commands")
     warehouse_sqlite_path = LaunchConfiguration("warehouse_sqlite_path")
     start_servo = LaunchConfiguration("start_servo")
+    use_joint_group_position_controller = LaunchConfiguration("use_joint_group_position_controller")
     gripper_ready_gate_condition = PythonExpression(
         [
             "'",
@@ -106,6 +107,9 @@ def launch_setup(context):
                 " ",
                 "fake_sensor_commands:=",
                 fake_sensor_commands,
+                " ",
+                "use_joint_group_position_controller:=",
+                use_joint_group_position_controller,
             ]
         ),
         value_type=str,
@@ -293,15 +297,28 @@ def launch_setup(context):
     )
 
     # Run robot controller
+
+    
+
+    # Notice the single quotes added before and after the LaunchConfiguration
+    chosen_controller = PythonExpression([
+        "'joint_group_position_controller' if '", 
+        LaunchConfiguration("use_joint_group_position_controller"), 
+        "' == 'true' else 'rizon_arm_controller'"
+    ])
+
+    # 2. Pass the dynamic variable straight to a single Node declaration
     robot_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
         arguments=[
-            "rizon_arm_controller",
+            chosen_controller,
             "--controller-manager",
             "/controller_manager",
         ],
     )
+
+
 
     # Run joint state broadcaster
     joint_state_broadcaster_spawner = Node(
@@ -541,6 +558,14 @@ def generate_launch_description():
             "start_servo",
             default_value="false",
             description="Start the MoveIt servo node?",
+        )
+    )
+
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "use_joint_group_position_controller",
+            default_value="false",
+            description="Use the ultra-low latency joint_group_position_controller for visual servoing?",
         )
     )
 

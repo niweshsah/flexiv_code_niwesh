@@ -125,3 +125,18 @@ target_link_libraries(simple_aruco_code
     realsense2::realsense2
     ${OpenCV_LIBS}
 )
+
+
+add_executable(arcuo_pbvs src/arcuo_pbvs.cpp)
+
+target_include_directories(arcuo_pbvs PRIVATE 
+    ${OpenCV_INCLUDE_DIRS}
+    ${VISP_INCLUDE_DIRS}
+)
+
+target_link_libraries(arcuo_pbvs PRIVATE
+    flexiv::flexiv_rdk 
+    realsense2::realsense2
+    ${OpenCV_LIBS}
+    ${VISP_LIBRARIES}
+)
