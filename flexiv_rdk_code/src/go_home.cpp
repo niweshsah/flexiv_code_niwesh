@@ -6,10 +6,11 @@
 #include <chrono>
 #include <cmath>
 #include <map>
-// Note: <variant> header is no longer strictly necessary just for the alias,
-// as RDK 1.9 headers provide flexiv::rdk::FlexivDataTypes natively.
 
-// Utility function to safely convert Radians to Degrees
+// Use Instructions
+
+// ./go_home <robot_sn> like ./go_home Rizon4s-0633387
+
 double rad2deg(double rad)
 {
     return rad * (180.0 / M_PI);
@@ -19,8 +20,9 @@ int main(int argc, char **argv)
 {
     if (argc < 2)
     {
-        std::cerr << "Usage: ./go_home <robot_sn>" << std::endl;
-        std::cerr << "Example: ./go_home Rizon4-123456" << std::endl;
+        std::cout << "Make sure controller of rizon is connected properly and we can connect to it." << std::endl;
+        std::cout << "Usage: ./go_home <robot_sn>" << std::endl;
+        std::cout << "Example: ./go_home Rizon4-123456" << std::endl;
         return -1;
     }
 
@@ -28,6 +30,7 @@ int main(int argc, char **argv)
     {
         // 1. Initialize Robot Connection
         std::cout << "[Init] Connecting to Flexiv Robot..." << std::endl;
+        std::cout << "[Init] Robot Serial Number: " << argv[1] << std::endl;
         flexiv::rdk::Robot robot(argv[1]);
 
         // 2. Enable the Robot and Clear Faults

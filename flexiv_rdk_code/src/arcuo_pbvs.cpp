@@ -290,7 +290,12 @@ private:
 int main(int argc, char **argv)
 {
     if (argc < 2)
+    {
+        std::cout << "Make sure controller of rizon is connected properly and we can connect to it." << std::endl;
+        std::cout << "Usage: ./aruco_pbvs <robot_sn>" << std::endl;
+        std::cout << "Example: ./aruco_pbvs Rizon4-063387" << std::endl;
         return -1;
+    }
 
     VisualServoApp app(argv[1]);
 
